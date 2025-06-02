@@ -1,0 +1,1500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LA Rent Control Calculator - Squarespace Version</title>
+    <style>
+        /* Squarespace-specific reset and namespace */
+        .kla-rent-calculator * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .kla-rent-calculator {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background: #f8fafc;
+            padding: 15px;
+            font-size: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Override potential Squarespace conflicts */
+        .kla-rent-calculator input,
+        .kla-rent-calculator button,
+        .kla-rent-calculator canvas {
+            font-family: inherit !important;
+            color: inherit;
+        }
+
+        .kla-rent-calculator .widget-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .kla-rent-calculator .welcome-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .kla-rent-calculator .welcome-section.hidden {
+            display: none;
+        }
+
+        .kla-rent-calculator .welcome-title {
+            color: #0303ab;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .kla-rent-calculator .welcome-subtitle {
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .kla-rent-calculator .input-form {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .kla-rent-calculator .form-group {
+            margin-bottom: 20px;
+        }
+
+        .kla-rent-calculator .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .kla-rent-calculator .rent-input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .kla-rent-calculator .rent-input-large {
+            width: 100%;
+            padding: 15px 20px 15px 45px;
+            border: 2px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 1.2rem !important;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+            background: white;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
+        }
+
+        .kla-rent-calculator .rent-input-large:focus {
+            outline: none;
+            border-color: #0303ab;
+            box-shadow: 0 0 0 4px rgba(3, 3, 171, 0.1);
+        }
+
+        .kla-rent-calculator .currency-symbol-large {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            font-weight: 700;
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+
+        .kla-rent-calculator .utilities-section {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .kla-rent-calculator .utilities-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: #374151;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .kla-rent-calculator .utilities-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #0303ab;
+        }
+
+        .kla-rent-calculator .utilities-checkbox:focus {
+            outline: 2px solid #0303ab;
+            outline-offset: 2px;
+        }
+
+        .kla-rent-calculator .submit-btn {
+            background: #0303ab;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1rem !important;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 150px;
+            font-family: inherit !important;
+        }
+
+        .kla-rent-calculator .submit-btn:hover {
+            background: #0202a0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(3, 3, 171, 0.3);
+        }
+
+        .kla-rent-calculator .submit-btn:focus {
+            outline: 3px solid #0303ab;
+            outline-offset: 2px;
+        }
+
+        .kla-rent-calculator .calculator-section {
+            display: none;
+        }
+
+        .kla-rent-calculator .calculator-section.active {
+            display: block;
+        }
+
+        .kla-rent-calculator .widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .kla-rent-calculator .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .kla-rent-calculator .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .kla-rent-calculator .edit-btn {
+            background: #f8fafc;
+            color: #0303ab;
+            border: 2px solid #0303ab;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem !important;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit !important;
+        }
+
+        .kla-rent-calculator .edit-btn:hover {
+            background: #0303ab;
+            color: white;
+        }
+
+        .kla-rent-calculator .edit-btn:focus {
+            outline: 2px solid #0303ab;
+            outline-offset: 2px;
+        }
+
+        .kla-rent-calculator .rent-display {
+            color: #6b7280;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .kla-rent-calculator .display-toggle {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 3px;
+            gap: 2px;
+        }
+
+        .kla-rent-calculator .toggle-btn {
+            padding: 6px 12px;
+            border: none;
+            background: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.8rem !important;
+            color: #6b7280;
+            transition: all 0.2s;
+            min-width: 60px;
+            font-family: inherit !important;
+        }
+
+        .kla-rent-calculator .toggle-btn.active {
+            background: #0303ab;
+            color: white;
+            box-shadow: 0 2px 4px rgba(3, 3, 171, 0.2);
+        }
+
+        .kla-rent-calculator .toggle-btn:focus {
+            outline: 2px solid #0303ab;
+            outline-offset: 2px;
+        }
+
+        .kla-rent-calculator .widget-title {
+            color: #0303ab;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .kla-rent-calculator .settings-btn {
+            background: none;
+            border: 2px solid transparent;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .kla-rent-calculator .settings-btn:hover {
+            background: #f3f4f6;
+            border-color: #0303ab;
+        }
+
+        .kla-rent-calculator .settings-btn:focus {
+            outline: 3px solid #0303ab;
+            outline-offset: 2px;
+        }
+
+        .kla-rent-calculator .settings-icon {
+            width: 20px;
+            height: 20px;
+            fill: #6b7280;
+        }
+
+        .kla-rent-calculator .boxes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .kla-rent-calculator .calc-box {
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .kla-rent-calculator .calc-box:focus-within {
+            outline: 3px solid #0303ab;
+            outline-offset: 2px;
+        }
+
+        .kla-rent-calculator .calc-box.progressive {
+            background: linear-gradient(135deg, #fff2e6, #ffe6cc);
+            border-color: #ff914d;
+        }
+
+        .kla-rent-calculator .calc-box.current {
+            background: linear-gradient(135deg, #e6e6ff, #ccccff);
+            border-color: #0303ab;
+        }
+
+        .kla-rent-calculator .calc-box.moderate {
+            background: linear-gradient(135deg, #f0f0f0, #e6e6e6);
+            border-color: #666666;
+        }
+
+        .kla-rent-calculator .box-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .kla-rent-calculator .box-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .kla-rent-calculator .box-rent {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #111827;
+            line-height: 1.2;
+        }
+
+        .kla-rent-calculator .box-increase {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #0303ab;
+            margin-top: 2px;
+        }
+
+        .kla-rent-calculator .visualization-section {
+            margin-bottom: 20px;
+        }
+
+        .kla-rent-calculator .view-tabs {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 15px;
+        }
+
+        .kla-rent-calculator .view-tab {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            background: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem !important;
+            color: #6b7280;
+            transition: all 0.2s;
+            font-family: inherit !important;
+        }
+
+        .kla-rent-calculator .view-tab.active {
+            background: white;
+            color: #1f2937;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .kla-rent-calculator .view-tab:focus {
+            outline: 2px solid #0303ab;
+            outline-offset: 2px;
+        }
+
+        .kla-rent-calculator .view-content {
+            display: none;
+        }
+
+        .kla-rent-calculator .view-content.active {
+            display: block;
+        }
+
+        .kla-rent-calculator .chart-container {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 15px;
+        }
+
+        .kla-rent-calculator .chart-canvas {
+            width: 100%;
+            height: 160px;
+            display: block;
+        }
+
+        .kla-rent-calculator .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .kla-rent-calculator .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .kla-rent-calculator .legend-color {
+            width: 12px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .kla-rent-calculator .legend-item.progressive .legend-color { background: #ff914d; }
+        .kla-rent-calculator .legend-item.current .legend-color { background: #0303ab; }
+        .kla-rent-calculator .legend-item.moderate .legend-color { background: #666666; }
+
+        .kla-rent-calculator .data-table {
+            background: #f8fafc;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .kla-rent-calculator .table-header {
+            display: grid;
+            grid-template-columns: 50px 1fr 1fr 1fr;
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.8rem;
+        }
+
+        .kla-rent-calculator .table-header > div {
+            padding: 10px 6px;
+            text-align: center;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .kla-rent-calculator .table-header > div:last-child {
+            border-right: none;
+        }
+
+        .kla-rent-calculator .table-row {
+            display: grid;
+            grid-template-columns: 50px 1fr 1fr 1fr;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.8rem;
+        }
+
+        .kla-rent-calculator .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .kla-rent-calculator .table-row > div {
+            padding: 8px 6px;
+            text-align: center;
+            border-right: 1px solid #f1f5f9;
+        }
+
+        .kla-rent-calculator .table-row > div:last-child {
+            border-right: none;
+        }
+
+        .kla-rent-calculator .table-row > div:first-child {
+            font-weight: 600;
+            background: #f8fafc;
+        }
+
+        .kla-rent-calculator .year-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .kla-rent-calculator .year-tab {
+            padding: 8px 14px;
+            border: 2px solid #d1d5db;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem !important;
+            font-weight: 500;
+            color: #6b7280;
+            transition: all 0.2s;
+            min-width: 60px;
+            font-family: inherit !important;
+        }
+
+        .kla-rent-calculator .year-tab.active {
+            background: #0303ab;
+            color: white;
+            border-color: #0303ab;
+        }
+
+        .kla-rent-calculator .year-tab:hover:not(.active) {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .kla-rent-calculator .year-tab:focus {
+            outline: 2px solid #0303ab;
+            outline-offset: 2px;
+        }
+
+        .kla-rent-calculator .savings-section {
+            background: linear-gradient(135deg, #fff2e6, #ffe6cc);
+            border: 2px solid #ff914d;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .kla-rent-calculator .savings-title {
+            color: #0303ab;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 8px;
+        }
+
+        .kla-rent-calculator .savings-amount {
+            color: #ff914d;
+            font-weight: 800;
+            font-size: 1.3rem;
+        }
+
+        .kla-rent-calculator .savings-period {
+            color: #374151;
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .kla-rent-calculator .settings-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .kla-rent-calculator .settings-modal.active {
+            display: flex;
+        }
+
+        .kla-rent-calculator .settings-content {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .kla-rent-calculator .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .kla-rent-calculator .settings-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #1f2937;
+        }
+
+        .kla-rent-calculator .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 4px;
+            font-family: inherit !important;
+        }
+
+        .kla-rent-calculator .settings-group {
+            margin-bottom: 20px;
+        }
+
+        .kla-rent-calculator .settings-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .kla-rent-calculator .inflation-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .kla-rent-calculator .inflation-slider {
+            flex: 1;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            accent-color: #0303ab;
+        }
+
+        .kla-rent-calculator .inflation-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #0303ab;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .kla-rent-calculator .inflation-value {
+            background: #0303ab;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .kla-rent-calculator .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Responsive adjustments for Squarespace containers */
+        @media (max-width: 900px) {
+            .kla-rent-calculator .boxes-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .kla-rent-calculator .widget-title {
+                font-size: 1.3rem;
+            }
+
+            .kla-rent-calculator .header-left {
+                gap: 8px;
+            }
+
+            .kla-rent-calculator .year-tabs {
+                justify-content: stretch;
+            }
+
+            .kla-rent-calculator .year-tab {
+                flex: 1;
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .kla-rent-calculator {
+                margin: 0;
+                border-radius: 0;
+                padding: 15px;
+            }
+
+            .kla-rent-calculator .widget-container {
+                margin: 0;
+                border-radius: 0;
+                padding: 15px;
+            }
+
+            .kla-rent-calculator .boxes-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .kla-rent-calculator .calc-box {
+                padding: 12px;
+                min-height: 80px;
+            }
+
+            .kla-rent-calculator .chart-canvas {
+                height: 140px;
+            }
+
+            .kla-rent-calculator .year-tabs {
+                gap: 4px;
+                flex-wrap: wrap;
+            }
+
+            .kla-rent-calculator .year-tab {
+                padding: 5px 8px;
+                font-size: 0.8rem !important;
+                min-width: 50px;
+            }
+
+            .kla-rent-calculator .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .kla-rent-calculator .header-right {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .kla-rent-calculator .display-toggle {
+                order: -1;
+            }
+
+            .kla-rent-calculator .rent-input-large {
+                font-size: 1.1rem !important;
+                padding: 12px 18px 12px 35px;
+            }
+
+            .kla-rent-calculator .currency-symbol-large {
+                left: 15px;
+                font-size: 1.1rem;
+            }
+
+            .kla-rent-calculator .welcome-title {
+                font-size: 1.1rem;
+            }
+
+            .kla-rent-calculator .welcome-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .kla-rent-calculator .submit-btn {
+                padding: 12px 24px;
+                font-size: 0.95rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="kla-rent-calculator">
+        <div class="widget-container">
+            <!-- Welcome Section -->
+            <section class="welcome-section" id="kla-welcome-section">
+                <h1 class="widget-title">Rent Control Calculator</h1>
+                <h2 class="welcome-title">Compare LA Rent Control Formulas</h2>
+                <p class="welcome-subtitle">Enter your current rent to see how different proposals would affect your housing costs</p>
+                
+                <div class="input-form">
+                    <div class="form-group">
+                        <label class="form-label" for="kla-rent-input">Your Current Monthly Rent</label>
+                        <div class="rent-input-group">
+                            <span class="currency-symbol-large" aria-hidden="true">$</span>
+                            <input type="number" id="kla-rent-input" class="rent-input-large" min="0" step="50" value="2000" 
+                                   aria-describedby="kla-rent-help" placeholder="2000">
+                        </div>
+                        <div id="kla-rent-help" class="sr-only">Enter your current monthly rent amount in dollars</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="utilities-section">
+                            <label class="utilities-label">
+                                <input type="checkbox" id="kla-utilities-input" class="utilities-checkbox" aria-describedby="kla-utilities-help">
+                                <span>My landlord provides gas and/or electricity</span>
+                            </label>
+                            <div id="kla-utilities-help" class="sr-only">Check this if your landlord pays for your gas or electricity utilities</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="submit-btn" id="kla-calculate-btn">View Comparison</button>
+            </section>
+
+            <!-- Calculator Section -->
+            <section class="calculator-section" id="kla-calculator-section">
+                <div class="widget-header">
+                    <div class="header-left">
+                        <h1 class="widget-title">Rent Control Calculator</h1>
+                        <div class="rent-display" id="kla-rent-display">$2,000/month</div>
+                    </div>
+                    
+                    <div class="header-right">
+                        <button class="edit-btn" id="kla-edit-btn" aria-label="Edit rent amount and settings">Edit</button>
+                        <button class="settings-btn" id="kla-settings-btn" aria-label="Open settings to adjust inflation rate">
+                            <svg class="settings-icon" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
+                            </svg>
+                        </button>
+                        <div class="display-toggle" role="radiogroup" aria-label="Choose display format">
+                            <button class="toggle-btn active" id="kla-dollar-toggle" role="radio" aria-checked="true">$</button>
+                            <button class="toggle-btn" id="kla-percent-toggle" role="radio" aria-checked="false">%</button>
+                        </div>
+                    </div>
+                </div>
+            
+                <section class="boxes-grid" aria-label="Rent comparison results">
+                    <div class="calc-box progressive" role="group" aria-labelledby="kla-progressive-title">
+                        <div class="box-title" id="kla-progressive-title">Keep LA Housed</div>
+                        <div class="box-content" aria-live="polite">
+                            <div class="box-rent" id="kla-progressive-rent" aria-label="Rent under Keep LA Housed formula">$2,000</div>
+                            <div class="box-increase" id="kla-progressive-increase" aria-label="Monthly increase amount">+$0/mo</div>
+                        </div>
+                    </div>
+
+                    <div class="calc-box current" role="group" aria-labelledby="kla-current-title">
+                        <div class="box-title" id="kla-current-title">Current LARSO</div>
+                        <div class="box-content" aria-live="polite">
+                            <div class="box-rent" id="kla-current-rent-result" aria-label="Rent under current LARSO formula">$2,000</div>
+                            <div class="box-increase" id="kla-current-increase" aria-label="Monthly increase amount">+$0/mo</div>
+                        </div>
+                    </div>
+
+                    <div class="calc-box moderate" role="group" aria-labelledby="kla-moderate-title">
+                        <div class="box-title" id="kla-moderate-title">Housing Dept</div>
+                        <div class="box-content" aria-live="polite">
+                            <div class="box-rent" id="kla-moderate-rent" aria-label="Rent under Housing Department formula">$2,000</div>
+                            <div class="box-increase" id="kla-moderate-increase" aria-label="Monthly increase amount">+$0/mo</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="visualization-section" aria-label="Rent progression visualization">
+                    <div class="view-tabs" role="tablist" aria-label="View type selection">
+                        <button class="view-tab active" data-view="chart" role="tab" aria-selected="true" aria-controls="kla-chart-view" id="kla-chart-tab">Chart</button>
+                        <button class="view-tab" data-view="table" role="tab" aria-selected="false" aria-controls="kla-table-view" id="kla-table-tab">Table</button>
+                    </div>
+
+                    <div class="view-content active" id="kla-chart-view" role="tabpanel" aria-labelledby="kla-chart-tab">
+                        <div class="chart-container">
+                            <canvas id="kla-line-chart" class="chart-canvas" aria-label="Line chart showing rent progression over time"></canvas>
+                            <div class="chart-legend" aria-label="Chart legend">
+                                <div class="legend-item progressive">
+                                    <span class="legend-color" aria-hidden="true"></span>
+                                    <span>Keep LA Housed</span>
+                                </div>
+                                <div class="legend-item current">
+                                    <span class="legend-color" aria-hidden="true"></span>
+                                    <span>Current LARSO</span>
+                                </div>
+                                <div class="legend-item moderate">
+                                    <span class="legend-color" aria-hidden="true"></span>
+                                    <span>Housing Dept</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="view-content" id="kla-table-view" role="tabpanel" aria-labelledby="kla-table-tab">
+                        <div class="data-table">
+                            <div class="table-header" role="row">
+                                <div role="columnheader">Year</div>
+                                <div role="columnheader">Keep LA Housed</div>
+                                <div role="columnheader">Current LARSO</div>
+                                <div role="columnheader">Housing Dept</div>
+                            </div>
+                            <div id="kla-data-table-body" role="grid" aria-label="Rent progression data table">
+                                <!-- Table rows populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="year-tabs" role="radiogroup" aria-label="Select projection timeline">
+                    <button class="year-tab" data-years="1" role="radio" aria-checked="false">1 Year</button>
+                    <button class="year-tab" data-years="3" role="radio" aria-checked="false">3 Years</button>
+                    <button class="year-tab active" data-years="5" role="radio" aria-checked="true">5 Years</button>
+                    <button class="year-tab" data-years="10" role="radio" aria-checked="false">10 Years</button>
+                </div>
+
+                <section class="savings-section" aria-label="Annual savings summary">
+                    <h2 class="savings-title">Annual Savings</h2>
+                    <div class="savings-amount" id="kla-annual-savings" aria-live="polite">$0</div>
+                    <div class="savings-period">with Keep LA Housed formula</div>
+                </section>
+            </section>
+        </div>
+
+        <div class="settings-modal" id="kla-settings-modal">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h2 class="settings-title">Settings</h2>
+                    <button class="close-btn" id="kla-close-settings">&times;</button>
+                </div>
+                
+                <div class="settings-group">
+                    <label class="settings-label">Inflation Rate (CPI)</label>
+                    <div class="inflation-controls">
+                        <input type="range" id="kla-inflation-rate" class="inflation-slider" min="0" max="10" step="0.1" value="2.8">
+                        <div class="inflation-value">
+                            <span id="kla-inflation-display">2.8</span>%
+                        </div>
+                    </div>
+                    <div style="font-size: 0.8rem; color: #6b7280; margin-top: 8px;">
+                        Recent LA area CPI has averaged 2.8% annually
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Squarespace-safe implementation with namespaced IDs
+        (function() {
+            'use strict';
+            
+            class SquarespaceRentCalculator {
+                constructor() {
+                    this.currentRent = 2000;
+                    this.inflationRate = 2.8;
+                    this.utilitiesIncluded = false;
+                    this.projectionYears = 5;
+                    this.currentView = 'chart';
+                    this.displayFormat = 'dollar';
+                    this.isCalculatorVisible = false;
+
+                    this.initializeElements();
+                    this.bindEvents();
+                    this.updateRentDisplay();
+                }
+
+                initializeElements() {
+                    this.elements = {
+                        // Welcome section elements
+                        welcomeSection: document.getElementById("kla-welcome-section"),
+                        calculatorSection: document.getElementById("kla-calculator-section"),
+                        rentInput: document.getElementById("kla-rent-input"),
+                        utilitiesInput: document.getElementById("kla-utilities-input"),
+                        calculateBtn: document.getElementById("kla-calculate-btn"),
+                        editBtn: document.getElementById("kla-edit-btn"),
+                        rentDisplay: document.getElementById("kla-rent-display"),
+
+                        // Settings elements
+                        inflationRate: document.getElementById("kla-inflation-rate"),
+                        inflationDisplay: document.getElementById("kla-inflation-display"),
+                        settingsBtn: document.getElementById("kla-settings-btn"),
+                        settingsModal: document.getElementById("kla-settings-modal"),
+                        closeSettings: document.getElementById("kla-close-settings"),
+
+                        // Results elements
+                        progressiveRent: document.getElementById("kla-progressive-rent"),
+                        progressiveIncrease: document.getElementById("kla-progressive-increase"),
+                        currentRentResult: document.getElementById("kla-current-rent-result"),
+                        currentIncrease: document.getElementById("kla-current-increase"),
+                        moderateRent: document.getElementById("kla-moderate-rent"),
+                        moderateIncrease: document.getElementById("kla-moderate-increase"),
+                        annualSavings: document.getElementById("kla-annual-savings"),
+
+                        // Chart and table elements
+                        lineChart: document.getElementById("kla-line-chart"),
+                        dataTableBody: document.getElementById("kla-data-table-body"),
+                        viewTabs: document.querySelectorAll(".kla-rent-calculator .view-tab"),
+                        viewContents: document.querySelectorAll(".kla-rent-calculator .view-content"),
+                        yearTabs: document.querySelectorAll(".kla-rent-calculator .year-tab"),
+                        chartView: document.getElementById("kla-chart-view"),
+                        tableView: document.getElementById("kla-table-view"),
+
+                        // Display format toggle
+                        dollarToggle: document.getElementById("kla-dollar-toggle"),
+                        percentToggle: document.getElementById("kla-percent-toggle")
+                    };
+
+                    if (this.elements.lineChart) {
+                        this.ctx = this.elements.lineChart.getContext("2d");
+                    }
+                }
+
+                bindEvents() {
+                    // Welcome section events
+                    if (this.elements.calculateBtn) {
+                        this.elements.calculateBtn.addEventListener("click", () => {
+                            this.currentRent = parseFloat(this.elements.rentInput.value) || 2000;
+                            this.utilitiesIncluded = this.elements.utilitiesInput.checked;
+                            this.showCalculator();
+                        });
+                    }
+
+                    if (this.elements.editBtn) {
+                        this.elements.editBtn.addEventListener("click", () => {
+                            this.showWelcome();
+                        });
+                    }
+
+                    // Settings events
+                    if (this.elements.inflationRate) {
+                        this.elements.inflationRate.addEventListener("input", (e) => {
+                            this.inflationRate = parseFloat(e.target.value);
+                            this.elements.inflationDisplay.textContent = this.inflationRate.toFixed(1);
+                            if (this.isCalculatorVisible) {
+                                this.calculate();
+                            }
+                        });
+                    }
+
+                    if (this.elements.settingsBtn) {
+                        this.elements.settingsBtn.addEventListener("click", () => {
+                            this.elements.settingsModal.classList.add("active");
+                        });
+                    }
+
+                    if (this.elements.closeSettings) {
+                        this.elements.closeSettings.addEventListener("click", () => {
+                            this.elements.settingsModal.classList.remove("active");
+                        });
+                    }
+
+                    if (this.elements.settingsModal) {
+                        this.elements.settingsModal.addEventListener("click", (e) => {
+                            if (e.target === this.elements.settingsModal) {
+                                this.elements.settingsModal.classList.remove("active");
+                            }
+                        });
+                    }
+
+                    // View and year tab events
+                    this.elements.viewTabs.forEach(tab => {
+                        tab.addEventListener("click", (e) => {
+                            const view = e.target.dataset.view;
+                            this.switchView(view);
+                        });
+                    });
+
+                    this.elements.yearTabs.forEach(tab => {
+                        tab.addEventListener("click", (e) => {
+                            const years = parseInt(e.target.dataset.years);
+                            this.setProjectionYears(years);
+                        });
+                    });
+
+                    // Display format toggle events
+                    if (this.elements.dollarToggle) {
+                        this.elements.dollarToggle.addEventListener("click", () => {
+                            this.setDisplayFormat('dollar');
+                        });
+                    }
+
+                    if (this.elements.percentToggle) {
+                        this.elements.percentToggle.addEventListener("click", () => {
+                            this.setDisplayFormat('percent');
+                        });
+                    }
+
+                    // Throttled resize handler
+                    let resizeTimeout;
+                    window.addEventListener("resize", () => {
+                        clearTimeout(resizeTimeout);
+                        resizeTimeout = setTimeout(() => {
+                            if (this.currentView === 'chart' && this.isCalculatorVisible && this.elements.lineChart) {
+                                this.resizeCanvas();
+                                this.updateProjections();
+                            }
+                        }, 250);
+                    });
+
+                    // Initial canvas setup
+                    if (this.elements.lineChart) {
+                        setTimeout(() => this.resizeCanvas(), 100);
+                    }
+                }
+
+                showCalculator() {
+                    this.isCalculatorVisible = true;
+                    if (this.elements.welcomeSection) {
+                        this.elements.welcomeSection.classList.add("hidden");
+                    }
+                    if (this.elements.calculatorSection) {
+                        this.elements.calculatorSection.classList.add("active");
+                    }
+                    this.updateRentDisplay();
+                    
+                    // Ensure canvas is ready before calculating
+                    requestAnimationFrame(() => {
+                        if (this.elements.lineChart) {
+                            this.resizeCanvas();
+                        }
+                        this.calculate();
+                    });
+                }
+
+                showWelcome() {
+                    this.isCalculatorVisible = false;
+                    if (this.elements.welcomeSection) {
+                        this.elements.welcomeSection.classList.remove("hidden");
+                    }
+                    if (this.elements.calculatorSection) {
+                        this.elements.calculatorSection.classList.remove("active");
+                    }
+                    // Sync the welcome form with current values
+                    if (this.elements.rentInput) {
+                        this.elements.rentInput.value = this.currentRent;
+                    }
+                    if (this.elements.utilitiesInput) {
+                        this.elements.utilitiesInput.checked = this.utilitiesIncluded;
+                    }
+                }
+
+                updateRentDisplay() {
+                    if (this.elements.rentDisplay) {
+                        const utilities = this.utilitiesIncluded ? " (utilities included)" : "";
+                        this.elements.rentDisplay.textContent = `${this.formatCurrency(this.currentRent)}/month${utilities}`;
+                    }
+                }
+
+                setDisplayFormat(format) {
+                    this.displayFormat = format;
+                    
+                    // Update toggle button states
+                    if (this.elements.dollarToggle && this.elements.percentToggle) {
+                        this.elements.dollarToggle.classList.toggle("active", format === 'dollar');
+                        this.elements.percentToggle.classList.toggle("active", format === 'percent');
+                        
+                        // Update ARIA states
+                        this.elements.dollarToggle.setAttribute('aria-checked', format === 'dollar');
+                        this.elements.percentToggle.setAttribute('aria-checked', format === 'percent');
+                    }
+                    
+                    // Recalculate and update display only if calculator is visible
+                    if (this.isCalculatorVisible) {
+                        this.calculate();
+                    }
+                }
+
+                switchView(view) {
+                    this.currentView = view;
+                    
+                    this.elements.viewTabs.forEach(tab => {
+                        const isActive = tab.dataset.view === view;
+                        tab.classList.toggle("active", isActive);
+                        tab.setAttribute('aria-selected', isActive);
+                    });
+
+                    this.elements.viewContents.forEach(content => {
+                        content.classList.toggle("active", content.id === `kla-${view}-view`);
+                    });
+
+                    // Always update projections when switching views to ensure data is current
+                    if (this.isCalculatorVisible) {
+                        this.updateProjections();
+                    }
+                }
+
+                setProjectionYears(years) {
+                    this.projectionYears = years;
+                    
+                    this.elements.yearTabs.forEach(tab => {
+                        const isActive = parseInt(tab.dataset.years) === years;
+                        tab.classList.toggle("active", isActive);
+                        tab.setAttribute('aria-checked', isActive);
+                    });
+
+                    if (this.isCalculatorVisible) {
+                        this.updateProjections();
+                    }
+                }
+
+                resizeCanvas() {
+                    if (!this.elements.lineChart) return;
+                    
+                    const canvas = this.elements.lineChart;
+                    const container = canvas.parentElement;
+                    if (!container) return;
+                    
+                    const rect = container.getBoundingClientRect();
+                    
+                    canvas.width = rect.width - 30;
+                    canvas.height = window.innerWidth <= 600 ? 140 : 160;
+                    canvas.style.width = canvas.width + "px";
+                    canvas.style.height = canvas.height + "px";
+                }
+
+                calculateProgressiveFormula(rent, inflation) {
+                    const increasePercent = Math.min(inflation * 0.6, 3);
+                    const increaseAmount = rent * (increasePercent / 100);
+                    return {
+                        newRent: rent + increaseAmount,
+                        increaseAmount: increaseAmount,
+                        increasePercent: increasePercent,
+                    };
+                }
+
+                calculateCurrentLARSO(rent, inflation, utilitiesIncluded) {
+                    let increasePercent = 3;
+                    
+                    if (utilitiesIncluded) {
+                        increasePercent += 2;
+                    }
+                    
+                    const percentIncrease = rent * (increasePercent / 100);
+                    const monthlySurcharges = 4.44;
+                    const totalIncrease = percentIncrease + monthlySurcharges;
+
+                    return {
+                        newRent: rent + totalIncrease,
+                        increaseAmount: totalIncrease,
+                        increasePercent: increasePercent,
+                    };
+                }
+
+                calculateModerateFormula(rent, inflation) {
+                    const increasePercent = Math.max(2, Math.min(inflation, 5));
+                    const increaseAmount = rent * (increasePercent / 100);
+                    return {
+                        newRent: rent + increaseAmount,
+                        increaseAmount: increaseAmount,
+                        increasePercent: increasePercent,
+                    };
+                }
+
+                formatCurrency(amount) {
+                    return new Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                    }).format(amount);
+                }
+
+                calculate() {
+                    const progressive = this.calculateProgressiveFormula(this.currentRent, this.inflationRate);
+                    const current = this.calculateCurrentLARSO(this.currentRent, this.inflationRate, this.utilitiesIncluded);
+                    const moderate = this.calculateModerateFormula(this.currentRent, this.inflationRate);
+
+                    this.updateResults(progressive, current, moderate);
+                    this.updateProjections();
+
+                    const annualSavings = (current.increaseAmount - progressive.increaseAmount) * 12;
+                    if (this.elements.annualSavings) {
+                        this.elements.annualSavings.textContent = this.formatCurrency(annualSavings);
+                    }
+                }
+
+                updateResults(progressive, current, moderate) {
+                    // Always show the new rent amount
+                    if (this.elements.progressiveRent) {
+                        this.elements.progressiveRent.textContent = this.formatCurrency(progressive.newRent);
+                    }
+                    if (this.elements.currentRentResult) {
+                        this.elements.currentRentResult.textContent = this.formatCurrency(current.newRent);
+                    }
+                    if (this.elements.moderateRent) {
+                        this.elements.moderateRent.textContent = this.formatCurrency(moderate.newRent);
+                    }
+
+                    // Show increase in selected format
+                    if (this.displayFormat === 'percent') {
+                        if (this.elements.progressiveIncrease) {
+                            this.elements.progressiveIncrease.textContent = `(+${progressive.increasePercent.toFixed(1)}%)`;
+                        }
+                        if (this.elements.currentIncrease) {
+                            this.elements.currentIncrease.textContent = `(+${current.increasePercent.toFixed(1)}%)`;
+                        }
+                        if (this.elements.moderateIncrease) {
+                            this.elements.moderateIncrease.textContent = `(+${moderate.increasePercent.toFixed(1)}%)`;
+                        }
+                    } else {
+                        if (this.elements.progressiveIncrease) {
+                            this.elements.progressiveIncrease.textContent = `(+${this.formatCurrency(progressive.increaseAmount)}/mo)`;
+                        }
+                        if (this.elements.currentIncrease) {
+                            this.elements.currentIncrease.textContent = `(+${this.formatCurrency(current.increaseAmount)}/mo)`;
+                        }
+                        if (this.elements.moderateIncrease) {
+                            this.elements.moderateIncrease.textContent = `(+${this.formatCurrency(moderate.increaseAmount)}/mo)`;
+                        }
+                    }
+                }
+
+                calculateProjectionData() {
+                    const data = [{
+                        year: 0,
+                        progressive: this.currentRent,
+                        current: this.currentRent,
+                        moderate: this.currentRent,
+                    }];
+
+                    let progressiveRent = this.currentRent;
+                    let currentRent = this.currentRent;
+                    let moderateRent = this.currentRent;
+
+                    for (let year = 1; year <= this.projectionYears; year++) {
+                        const progressiveCalc = this.calculateProgressiveFormula(progressiveRent, this.inflationRate);
+                        const currentCalc = this.calculateCurrentLARSO(currentRent, this.inflationRate, this.utilitiesIncluded);
+                        const moderateCalc = this.calculateModerateFormula(moderateRent, this.inflationRate);
+
+                        progressiveRent = progressiveCalc.newRent;
+                        currentRent = currentCalc.newRent;
+                        moderateRent = moderateCalc.newRent;
+
+                        data.push({
+                            year,
+                            progressive: progressiveRent,
+                            current: currentRent,
+                            moderate: moderateRent,
+                        });
+                    }
+
+                    return data;
+                }
+
+                drawLineChart(data) {
+                    if (!this.ctx || !this.elements.lineChart) return;
+                    
+                    const ctx = this.ctx;
+                    const canvas = this.elements.lineChart;
+                    const width = canvas.width;
+                    const height = canvas.height;
+
+                    ctx.clearRect(0, 0, width, height);
+
+                    if (data.length < 2) return;
+
+                    const padding = 35;
+                    const chartWidth = width - padding * 2;
+                    const chartHeight = height - padding * 2;
+
+                    const allValues = data.flatMap(d => [d.progressive, d.current, d.moderate]);
+                    const minValue = Math.min(...allValues);
+                    const maxValue = Math.max(...allValues);
+                    const valueRange = maxValue - minValue || 1;
+
+                    const getX = (year) => padding + (year / this.projectionYears) * chartWidth;
+                    const getY = (value) => padding + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+
+                    // Draw grid
+                    ctx.strokeStyle = "#f1f5f9";
+                    ctx.lineWidth = 1;
+
+                    for (let i = 0; i <= this.projectionYears; i++) {
+                        const x = getX(i);
+                        ctx.beginPath();
+                        ctx.moveTo(x, padding);
+                        ctx.lineTo(x, height - padding);
+                        ctx.stroke();
+                    }
+
+                    for (let i = 0; i <= 4; i++) {
+                        const y = padding + (i / 4) * chartHeight;
+                        ctx.beginPath();
+                        ctx.moveTo(padding, y);
+                        ctx.lineTo(width - padding, y);
+                        ctx.stroke();
+                    }
+
+                    // Draw lines
+                    const lines = [
+                        { data: "progressive", color: "#ff914d", width: 3 },
+                        { data: "current", color: "#0303ab", width: 3 },
+                        { data: "moderate", color: "#666666", width: 3 },
+                    ];
+
+                    lines.forEach(line => {
+                        ctx.strokeStyle = line.color;
+                        ctx.lineWidth = line.width;
+                        ctx.beginPath();
+
+                        data.forEach((point, index) => {
+                            const x = getX(point.year);
+                            const y = getY(point[line.data]);
+
+                            if (index === 0) {
+                                ctx.moveTo(x, y);
+                            } else {
+                                ctx.lineTo(x, y);
+                            }
+                        });
+
+                        ctx.stroke();
+
+                        // Draw points
+                        data.forEach(point => {
+                            const x = getX(point.year);
+                            const y = getY(point[line.data]);
+                            ctx.beginPath();
+                            ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                            ctx.fillStyle = line.color;
+                            ctx.fill();
+                        });
+                    });
+
+                    // Draw labels
+                    ctx.fillStyle = "#6b7280";
+                    ctx.font = "10px sans-serif";
+                    ctx.textAlign = "center";
+
+                    // X-axis labels
+                    for (let i = 0; i <= this.projectionYears; i++) {
+                        const x = getX(i);
+                        ctx.fillText(i.toString(), x, height - 12);
+                    }
+
+                    // Y-axis labels
+                    ctx.textAlign = "right";
+                    for (let i = 0; i <= 4; i++) {
+                        const value = minValue + (i / 4) * valueRange;
+                        const y = padding + ((4 - i) / 4) * chartHeight + 3;
+                        ctx.fillText(this.formatCurrency(value), padding - 5, y);
+                    }
+                }
+
+                updateProjections() {
+                    const projectionData = this.calculateProjectionData();
+                    
+                    if (this.currentView === 'chart') {
+                        // Ensure canvas is properly sized before drawing
+                        requestAnimationFrame(() => {
+                            if (this.elements.lineChart) {
+                                this.resizeCanvas();
+                                this.drawLineChart(projectionData);
+                            }
+                        });
+                    } else if (this.currentView === 'table') {
+                        this.updateDataTable(projectionData);
+                    }
+                }
+
+                updateDataTable(data) {
+                    if (!this.elements.dataTableBody) return;
+                    
+                    this.elements.dataTableBody.innerHTML = "";
+
+                    data.slice(1).forEach(yearData => {
+                        const row = document.createElement("div");
+                        row.className = "table-row";
+                        row.setAttribute('role', 'row');
+
+                        row.innerHTML = `
+                            <div role="cell">${yearData.year}</div>
+                            <div role="cell">${this.formatCurrency(yearData.progressive)}</div>
+                            <div role="cell">${this.formatCurrency(yearData.current)}</div>
+                            <div role="cell">${this.formatCurrency(yearData.moderate)}</div>
+                        `;
+
+                        this.elements.dataTableBody.appendChild(row);
+                    });
+                }
+            }
+
+            // Initialize when DOM is ready
+            function initCalculator() {
+                // Check if calculator container exists
+                if (document.querySelector('.kla-rent-calculator')) {
+                    new SquarespaceRentCalculator();
+                }
+            }
+
+            // Multiple initialization strategies for Squarespace
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initCalculator);
+            } else {
+                initCalculator();
+            }
+
+            // Also try initializing after a short delay for Squarespace's loading behavior
+            setTimeout(initCalculator, 100);
+        })();
+    </script>
+</body>
+</html>
