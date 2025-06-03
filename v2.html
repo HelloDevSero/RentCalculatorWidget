@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keep LA Housed Rent Calculator - Production Ready</title>
+    <style>
+        /* CSS Reset and Container */
+        .kla-rent-calculator * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+        }
+
+        .kla-rent-calculator {
+            --primary-color: #0303ab;
+            --secondary-color: #ff914d;
+            --neutral-color: #666666;
+            --text-color: #1f2937;
+            --light-bg: #f8fafc;
+            --border-color: #d1d5db;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 15px;
+            --spacing-lg: 20px;
+            --border-radius: 8px;
+            --border-radius-lg: 12px;
+            
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--light-bg);
+            padding: var(--spacing-md);
+            font-size: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .kla-rent-calculator .widget-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Typography */
+        .kla-rent-calculator .widget-title {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .kla-rent-calculator .welcome-title {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .kla-rent-calculator .welcome-subtitle {
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        /* Language Toggle */
+        .kla-rent-calculator .language-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+            padding: var(--spacing-sm);
+        }
+
+        .kla-rent-calculator .lang-btn {
+            background: none;
+            border: none;
+            color: #6b7280;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--spacing-xs);
+            transition: all 0.2s;
+        }
+
+        .kla-rent-calculator .lang-btn:hover {
+            color: var(--primary-color);
+            background: #f3f4f6;
+        }
+
+        .kla-rent-calculator .lang-btn.active {
+            color: var(--primary-color);
+            font-weight: 600;
+            background: #f0f9ff;
+        }
+
+        .kla-rent-calculator .lang-separator {
+            color: var(--border-color);
+            font-weight: 300;
+        }
+
+        /* Forms */
+        .kla-rent-calculator .input-form {
+            background: var(--light-bg);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .kla-rent-calculator .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .kla-rent-calculator .form-label {
+            display: block;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: var(--spacing-sm);
+            font-size: 0.95rem;
+        }
+
+        .kla-rent-calculator .rent-input-group {
+            position: relative;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .kla-rent-calculator .rent-input-large {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-lg) var(--spacing-md) 45px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            text-align: center;
+            background: white;
+            transition: border-color 0.2s;
+        }
+
+        .kla-rent-calculator .rent-input-large:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(3, 3, 171, 0.1);
+        }
+
+        .kla-rent-calculator .rent-input-large:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(3, 3, 171, 0.15);
+        }
+
+        .kla-rent-calculator .rent-input-large.error {
+            border-color: #dc2626;
+            background-color: #fef2f2;
+        }
+
+        .kla-rent-calculator .rent-input-large.error:focus {
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .kla-rent-calculator .error-message {
+            color: #dc2626;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .kla-rent-calculator .error-message.active {
+            display: block;
+        }
+
+        .kla-rent-calculator .currency-symbol-large {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            font-weight: 700;
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
+
+        .kla-rent-calculator .utilities-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            border: 2px solid #e5e7eb;
+        }
+
+        .kla-rent-calculator .utilities-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            color: #374151;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .kla-rent-calculator .utilities-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+
+        /* Buttons */
+        .kla-rent-calculator button {
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .kla-rent-calculator button:focus {
+            outline: none;
+        }
+
+        .kla-rent-calculator button:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+            box-shadow: 0 0 0 4px rgba(3, 3, 171, 0.15);
+        }
+
+        .kla-rent-calculator .utilities-checkbox:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .kla-rent-calculator .lang-btn:focus-visible,
+        .kla-rent-calculator .toggle-btn:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 1px;
+        }
+
+        /* High contrast and reduced motion support */
+        @media (prefers-contrast: high) {
+            .kla-rent-calculator *:focus-visible {
+                outline: 3px solid;
+                outline-offset: 2px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .kla-rent-calculator * {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+
+        .kla-rent-calculator .submit-btn {
+            background: var(--primary-color);
+            color: white;
+            padding: var(--spacing-md) 30px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            min-width: 150px;
+        }
+
+        .kla-rent-calculator .submit-btn:hover {
+            background: #0202a0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(3, 3, 171, 0.3);
+        }
+
+        .kla-rent-calculator .edit-btn {
+            background: var(--light-bg);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: var(--spacing-sm) 16px;
+            border-radius: var(--border-radius);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .kla-rent-calculator .edit-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Sections */
+        .kla-rent-calculator .welcome-section.hidden {
+            display: none;
+        }
+
+        .kla-rent-calculator .calculator-section {
+            display: none;
+        }
+
+        .kla-rent-calculator .calculator-section.active {
+            display: block;
+        }
+
+        /* Header */
+        .kla-rent-calculator .widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .kla-rent-calculator .header-left {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            flex-wrap: wrap;
+        }
+
+        .kla-rent-calculator .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .kla-rent-calculator .rent-display {
+            color: #6b7280;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .kla-rent-calculator .display-toggle {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: var(--border-radius);
+            padding: 3px;
+            gap: 2px;
+        }
+
+        .kla-rent-calculator .toggle-btn {
+            padding: 6px 12px;
+            background: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #6b7280;
+            min-width: 60px;
+        }
+
+        .kla-rent-calculator .toggle-btn.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 4px rgba(3, 3, 171, 0.2);
+        }
+
+        .kla-rent-calculator .settings-btn {
+            background: none;
+            border: 2px solid transparent;
+            padding: var(--spacing-sm);
+            border-radius: var(--border-radius);
+        }
+
+        .kla-rent-calculator .settings-btn:hover {
+            background: #f3f4f6;
+            border-color: var(--primary-color);
+        }
+
+        .kla-rent-calculator .settings-icon {
+            width: 20px;
+            height: 20px;
+            fill: #6b7280;
+        }
+
+        /* Grid and Boxes */
+        .kla-rent-calculator .boxes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .kla-rent-calculator .calc-box {
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius);
+            border: 2px solid;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .kla-rent-calculator .calc-box.progressive {
+            background: linear-gradient(135deg, #fff2e6, #ffe6cc);
+            border-color: var(--secondary-color);
+        }
+
+        .kla-rent-calculator .calc-box.current {
+            background: linear-gradient(135deg, #e6e6ff, #ccccff);
+            border-color: var(--primary-color);
+        }
+
+        .kla-rent-calculator .calc-box.moderate {
+            background: linear-gradient(135deg, #f0f0f0, #e6e6e6);
+            border-color: var(--neutral-color);
+        }
+
+        .kla-rent-calculator .box-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .kla-rent-calculator .box-content {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .kla-rent-calculator .box-rent {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #111827;
+        }
+
+        .kla-rent-calculator .box-increase {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary-color);
+        }
+
+        /* Visualization */
+        .kla-rent-calculator .view-tabs {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: var(--border-radius);
+            padding: 4px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .kla-rent-calculator .view-tab {
+            flex: 1;
+            padding: 10px 12px;
+            background: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            color: #6b7280;
+        }
+
+        .kla-rent-calculator .view-tab.active {
+            background: white;
+            color: var(--text-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .kla-rent-calculator .view-content {
+            display: none;
+        }
+
+        .kla-rent-calculator .view-content.active {
+            display: block;
+        }
+
+        .kla-rent-calculator .chart-container {
+            background: var(--light-bg);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            border: 1px solid #e2e8f0;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .kla-rent-calculator .chart-canvas {
+            width: 100%;
+            height: 160px;
+            display: block;
+        }
+
+        .kla-rent-calculator .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: var(--spacing-lg);
+            font-size: 0.8rem;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .kla-rent-calculator .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .kla-rent-calculator .legend-color {
+            width: 12px;
+            height: 3px;
+            border-radius: 2px;
+        }
+
+        .kla-rent-calculator .legend-item.progressive .legend-color { background: var(--secondary-color); }
+        .kla-rent-calculator .legend-item.current .legend-color { background: var(--primary-color); }
+        .kla-rent-calculator .legend-item.moderate .legend-color { background: var(--neutral-color); }
+
+        /* Table */
+        .kla-rent-calculator .data-table {
+            background: var(--light-bg);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .kla-rent-calculator .table-header {
+            display: grid;
+            grid-template-columns: 50px 1fr 1fr 1fr;
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #475569;
+            font-size: 0.8rem;
+        }
+
+        .kla-rent-calculator .table-header > div {
+            padding: 10px 6px;
+            text-align: center;
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .kla-rent-calculator .table-header > div:last-child {
+            border-right: none;
+        }
+
+        .kla-rent-calculator .table-row {
+            display: grid;
+            grid-template-columns: 50px 1fr 1fr 1fr;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 0.8rem;
+        }
+
+        .kla-rent-calculator .table-row:last-child {
+            border-bottom: none;
+        }
+
+        .kla-rent-calculator .table-row > div {
+            padding: var(--spacing-sm) 6px;
+            text-align: center;
+            border-right: 1px solid #f1f5f9;
+        }
+
+        .kla-rent-calculator .table-row > div:last-child {
+            border-right: none;
+        }
+
+        .kla-rent-calculator .table-row > div:first-child {
+            font-weight: 600;
+            background: var(--light-bg);
+        }
+
+        /* Year Tabs */
+        .kla-rent-calculator .year-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: var(--spacing-lg);
+            flex-wrap: wrap;
+        }
+
+        .kla-rent-calculator .year-tab {
+            padding: var(--spacing-sm) 14px;
+            border: 2px solid var(--border-color);
+            background: white;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #6b7280;
+            min-width: 60px;
+        }
+
+        .kla-rent-calculator .year-tab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .kla-rent-calculator .year-tab:hover:not(.active) {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        /* Savings Section */
+        .kla-rent-calculator .savings-section {
+            background: linear-gradient(135deg, #fff2e6, #ffe6cc);
+            border: 2px solid var(--secondary-color);
+            border-radius: var(--border-radius);
+            padding: var(--spacing-md);
+            text-align: center;
+        }
+
+        .kla-rent-calculator .savings-title {
+            color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .kla-rent-calculator .savings-amount {
+            color: var(--secondary-color);
+            font-weight: 800;
+            font-size: 1.3rem;
+        }
+
+        .kla-rent-calculator .savings-period {
+            color: #374151;
+            font-size: 0.85rem;
+            margin-top: var(--spacing-xs);
+        }
+
+        /* Modal */
+        .kla-rent-calculator .settings-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .kla-rent-calculator .settings-modal.active {
+            display: flex;
+        }
+
+        .kla-rent-calculator .settings-content {
+            background: white;
+            border-radius: var(--border-radius-lg);
+            padding: 25px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .kla-rent-calculator .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .kla-rent-calculator .settings-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--text-color);
+        }
+
+        .kla-rent-calculator .close-btn {
+            background: none;
+            font-size: 1.5rem;
+            color: #6b7280;
+            padding: var(--spacing-xs);
+        }
+
+        .kla-rent-calculator .settings-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .kla-rent-calculator .settings-label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        .kla-rent-calculator .inflation-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .kla-rent-calculator .inflation-slider {
+            flex: 1;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            accent-color: var(--primary-color);
+        }
+
+        .kla-rent-calculator .inflation-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .kla-rent-calculator .inflation-value {
+            background: var(--primary-color);
+            color: white;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .kla-rent-calculator .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 900px) {
+            .kla-rent-calculator .boxes-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kla-rent-calculator .widget-title {
+                font-size: 1.3rem;
+            }
+
+            .kla-rent-calculator .year-tabs {
+                justify-content: stretch;
+            }
+
+            .kla-rent-calculator .year-tab {
+                flex: 1;
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .kla-rent-calculator {
+                margin: 0;
+                border-radius: 0;
+                padding: var(--spacing-md);
+            }
+
+            .kla-rent-calculator .widget-container {
+                margin: 0;
+                border-radius: 0;
+                padding: var(--spacing-md);
+            }
+
+            .kla-rent-calculator .calc-box {
+                padding: 12px;
+                min-height: 80px;
+            }
+
+            .kla-rent-calculator .chart-canvas {
+                height: 140px;
+            }
+
+            .kla-rent-calculator .year-tab {
+                padding: 5px var(--spacing-sm);
+                font-size: 0.8rem;
+                min-width: 50px;
+            }
+
+            .kla-rent-calculator .header-left {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--spacing-sm);
+            }
+
+            .kla-rent-calculator .header-right {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+
+            .kla-rent-calculator .display-toggle {
+                order: -1;
+            }
+
+            .kla-rent-calculator .rent-input-large {
+                font-size: 1.1rem;
+                padding: 12px 18px 12px 35px;
+            }
+
+            .kla-rent-calculator .currency-symbol-large {
+                left: var(--spacing-md);
+                font-size: 1.1rem;
+            }
+
+            .kla-rent-calculator .welcome-title {
+                font-size: 1.1rem;
+            }
+
+            .kla-rent-calculator .welcome-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .kla-rent-calculator .submit-btn {
+                padding: 12px 24px;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="kla-rent-calculator">
+        <div class="widget-container">
+            <!-- Welcome Section -->
+            <section class="welcome-section" id="welcome" role="main">
+                <h1 class="widget-title">Rent Control Calculator</h1>
+                <h2 class="welcome-title" data-translate="welcomeTitle">Compare LA Rent Control Formulas</h2>
+                <p class="welcome-subtitle" data-translate="welcomeSubtitle">Enter your current rent to see how different proposals would affect your housing costs</p>
+                
+                <div class="language-toggle">
+                    <button class="lang-btn active" data-lang="en">English</button>
+                    <span class="lang-separator">|</span>
+                    <button class="lang-btn" data-lang="es">Español</button>
+                </div>
+                
+                <div class="input-form">
+                    <div class="form-group">
+                        <label class="form-label" for="rent-input" data-translate="rentLabel">Your Current Monthly Rent</label>
+                        <div class="rent-input-group">
+                            <span class="currency-symbol-large">$</span>
+                            <input type="number" id="rent-input" class="rent-input-large" 
+                                   min="500" max="25000" value="2000" placeholder="2000"
+                                   aria-describedby="rent-help rent-error"
+                                   aria-invalid="false">
+                        </div>
+                        <div id="rent-help" class="sr-only">Enter your current monthly rent amount in dollars</div>
+                        <div id="rent-error" class="error-message" aria-live="polite"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="utilities-section">
+                            <label class="utilities-label">
+                                <input type="checkbox" class="utilities-checkbox">
+                                <span data-translate="utilitiesText">My landlord provides gas and/or electricity</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="submit-btn" data-translate="calculateBtn">View Comparison</button>
+            </section>
+
+            <!-- Calculator Section -->
+            <section class="calculator-section" id="calculator" role="main">
+                <div class="widget-header">
+                    <div class="header-left">
+                        <h1 class="widget-title" data-translate="calculatorTitle">Rent Control Calculator</h1>
+                        <div class="rent-display" id="rent-display">$2,000/month</div>
+                    </div>
+                    
+                    <div class="header-right">
+                        <button class="edit-btn" data-translate="editBtn">Edit</button>
+                        <button class="settings-btn" aria-label="Open settings to adjust inflation rate">
+                            <svg class="settings-icon" viewBox="0 0 24 24" role="img" aria-hidden="true">
+                                <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97c0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1c0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
+                            </svg>
+                        </button>
+                        <div class="display-toggle" role="radiogroup" aria-label="Choose display format">
+                            <button class="toggle-btn active" data-format="dollar" role="radio" aria-checked="true">$</button>
+                            <button class="toggle-btn" data-format="percent" role="radio" aria-checked="false">%</button>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="boxes-grid">
+                    <div class="calc-box progressive">
+                        <div class="box-title" data-translate="keepLAHousedTitle">Keep LA Housed</div>
+                        <div class="box-content">
+                            <div class="box-rent" data-result="progressive">$2,000</div>
+                            <div class="box-increase" data-increase="progressive">+$0/mo</div>
+                        </div>
+                    </div>
+
+                    <div class="calc-box current">
+                        <div class="box-title" data-translate="currentLARSOTitle">Current LARSO</div>
+                        <div class="box-content">
+                            <div class="box-rent" data-result="current">$2,000</div>
+                            <div class="box-increase" data-increase="current">+$0/mo</div>
+                        </div>
+                    </div>
+
+                    <div class="calc-box moderate">
+                        <div class="box-title" data-translate="housingDeptTitle">Housing Dept</div>
+                        <div class="box-content">
+                            <div class="box-rent" data-result="moderate">$2,000</div>
+                            <div class="box-increase" data-increase="moderate">+$0/mo</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="visualization-section">
+                    <div class="view-tabs">
+                        <button class="view-tab active" data-view="chart" data-translate="chartTab">Chart</button>
+                        <button class="view-tab" data-view="table" data-translate="tableTab">Table</button>
+                    </div>
+
+                    <div class="view-content active" id="chart-view">
+                        <div class="chart-container">
+                            <canvas id="chart" class="chart-canvas"></canvas>
+                            <div class="chart-legend">
+                                <div class="legend-item progressive">
+                                    <span class="legend-color"></span>
+                                    <span data-translate="keepLAHousedTitle">Keep LA Housed</span>
+                                </div>
+                                <div class="legend-item current">
+                                    <span class="legend-color"></span>
+                                    <span data-translate="currentLARSOTitle">Current LARSO</span>
+                                </div>
+                                <div class="legend-item moderate">
+                                    <span class="legend-color"></span>
+                                    <span data-translate="housingDeptTitle">Housing Dept</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="view-content" id="table-view">
+                        <div class="data-table">
+                            <div class="table-header">
+                                <div data-translate="yearHeader">Year</div>
+                                <div data-translate="keepLAHousedTitle">Keep LA Housed</div>
+                                <div data-translate="currentLARSOTitle">Current LARSO</div>
+                                <div data-translate="housingDeptTitle">Housing Dept</div>
+                            </div>
+                            <div id="table-body">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="year-tabs">
+                    <button class="year-tab" data-years="1" data-translate="oneYear">1 Year</button>
+                    <button class="year-tab" data-years="3" data-translate="threeYears">3 Years</button>
+                    <button class="year-tab active" data-years="5" data-translate="fiveYears">5 Years</button>
+                    <button class="year-tab" data-years="10" data-translate="tenYears">10 Years</button>
+                </div>
+
+                <div class="savings-section">
+                    <h2 class="savings-title" data-translate="savingsTitle">Annual Savings</h2>
+                    <div class="savings-amount" id="savings-amount">$0</div>
+                    <div class="savings-period" data-translate="savingsPeriod">with Keep LA Housed formula</div>
+                </div>
+            </section>
+        </div>
+
+        <div class="settings-modal" id="settings-modal">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h2 class="settings-title" data-translate="settingsTitle">Settings</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                
+                <div class="settings-group">
+                    <label class="settings-label" data-translate="inflationLabel">Inflation Rate (CPI)</label>
+                    <div class="inflation-controls">
+                        <input type="range" id="inflation-slider" class="inflation-slider" min="0" max="10" step="0.1" value="2.8">
+                        <div class="inflation-value">
+                            <span id="inflation-display">2.8</span>%
+                        </div>
+                    </div>
+                    <div data-translate="inflationNote" style="font-size: 0.8rem; color: #6b7280; margin-top: 8px;">
+                        Recent LA area CPI has averaged 2.8% annually
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+            
+            class OptimizedRentCalculator {
+                constructor() {
+                    this.state = {
+                        currentRent: 2000,
+                        inflationRate: 2.8,
+                        utilitiesIncluded: false,
+                        projectionYears: 5,
+                        currentView: 'chart',
+                        displayFormat: 'dollar',
+                        currentLanguage: 'en',
+                        isCalculatorVisible: false
+                    };
+
+                    this.translations = {
+                        en: {
+                            welcomeTitle: "Compare LA Rent Control Formulas",
+                            welcomeSubtitle: "Enter your current rent to see how different proposals would affect your housing costs",
+                            rentLabel: "Your Current Monthly Rent",
+                            utilitiesText: "My landlord provides gas and/or electricity",
+                            calculateBtn: "View Comparison",
+                            calculatorTitle: "Rent Control Calculator",
+                            editBtn: "Edit",
+                            keepLAHousedTitle: "Keep LA Housed",
+                            currentLARSOTitle: "Current LARSO",
+                            housingDeptTitle: "Housing Dept",
+                            chartTab: "Chart",
+                            tableTab: "Table",
+                            yearHeader: "Year",
+                            oneYear: "1 Year",
+                            threeYears: "3 Years",
+                            fiveYears: "5 Years",
+                            tenYears: "10 Years",
+                            savingsTitle: "Annual Savings",
+                            savingsPeriod: "with Keep LA Housed formula",
+                            settingsTitle: "Settings",
+                            inflationLabel: "Inflation Rate (CPI)",
+                            inflationNote: "Recent LA area CPI has averaged 2.8% annually",
+                            month: "month",
+                            utilitiesIncluded: "utilities included",
+                            // Validation errors
+                            rentTooLow: "Rent must be at least $500 per month",
+                            rentTooHigh: "Rent cannot exceed $25,000 per month",
+                            rentRequired: "Please enter your monthly rent amount",
+                            rentInvalid: "Please enter a valid rent amount"
+                        },
+                        es: {
+                            welcomeTitle: "Compara las Fórmulas de Control de Alquiler de LA",
+                            welcomeSubtitle: "Ingresa tu alquiler actual para ver cómo las diferentes propuestas afectarían tus costos de vivienda",
+                            rentLabel: "Tu Alquiler Mensual Actual",
+                            utilitiesText: "Mi arrendador paga gas y/o electricidad",
+                            calculateBtn: "Ver Comparación",
+                            calculatorTitle: "Calculadora de Control de Alquiler",
+                            editBtn: "Editar",
+                            keepLAHousedTitle: "Keep LA Housed",
+                            currentLARSOTitle: "LARSO Actual",
+                            housingDeptTitle: "Depto. Vivienda",
+                            chartTab: "Gráfico",
+                            tableTab: "Tabla",
+                            yearHeader: "Año",
+                            oneYear: "1 Año",
+                            threeYears: "3 Años",
+                            fiveYears: "5 Años",
+                            tenYears: "10 Años",
+                            savingsTitle: "Ahorros Anuales",
+                            savingsPeriod: "con la fórmula de Keep LA Housed",
+                            settingsTitle: "Configuraciones",
+                            inflationLabel: "Tasa de Inflación (IPC)",
+                            inflationNote: "El IPC del área de LA ha promediado 2.8% anualmente recientemente",
+                            month: "mes",
+                            utilitiesIncluded: "servicios incluidos",
+                            // Validation errors
+                            rentTooLow: "El alquiler debe ser de al menos $500 por mes",
+                            rentTooHigh: "El alquiler no puede exceder $25,000 por mes",
+                            rentRequired: "Por favor ingresa tu alquiler mensual",
+                            rentInvalid: "Por favor ingresa una cantidad de alquiler válida"
+                        }
+                    };
+
+                    this.resizeObserver = null;
+                    this.resizeTimeout = null;
+
+                    this.init();
+                }
+
+                init() {
+                    this.container = document.querySelector('.kla-rent-calculator');
+                    if (!this.container) return;
+
+                    this.elements = this.getElements();
+                    this.validateTranslations();
+                    this.bindEvents();
+                    this.initializeChartResizing();
+                    this.updateLanguage();
+                    this.updateRentDisplay();
+                }
+
+                getElements() {
+                    const $ = (selector) => this.container.querySelector(selector);
+                    const $$ = (selector) => this.container.querySelectorAll(selector);
+
+                    return {
+                        welcome: $('#welcome'),
+                        calculator: $('#calculator'),
+                        rentInput: $('#rent-input'),
+                        rentError: $('#rent-error'),
+                        utilitiesCheckbox: $('.utilities-checkbox'),
+                        rentDisplay: $('#rent-display'),
+                        savingsAmount: $('#savings-amount'),
+                        chart: $('#chart'),
+                        tableBody: $('#table-body'),
+                        settingsModal: $('#settings-modal'),
+                        inflationSlider: $('#inflation-slider'),
+                        inflationDisplay: $('#inflation-display'),
+                        chartView: $('#chart-view'),
+                        tableView: $('#table-view'),
+                        
+                        // Collections
+                        langBtns: $$('.lang-btn'),
+                        viewTabs: $$('.view-tab'),
+                        yearTabs: $$('.year-tab'),
+                        toggleBtns: $$('.toggle-btn'),
+                        viewContents: $$('.view-content'),
+                        resultElements: $$('[data-result]'),
+                        increaseElements: $$('[data-increase]')
+                    };
+                }
+
+                // Robust translation getter with fallback
+                getTranslation(key, language = null) {
+                    const lang = language || this.state.currentLanguage;
+                    const translations = this.translations[lang];
+                    
+                    if (translations && translations[key]) {
+                        return translations[key];
+                    }
+                    
+                    // Fallback to English
+                    const englishTranslation = this.translations.en[key];
+                    if (englishTranslation) {
+                        console.warn(`Missing translation for key "${key}" in language "${lang}", using English fallback`);
+                        return englishTranslation;
+                    }
+                    
+                    // Ultimate fallback
+                    console.error(`Missing translation key "${key}" in all languages`);
+                    return `[Missing: ${key}]`;
+                }
+
+                // Validate translations during initialization
+                validateTranslations() {
+                    const requiredKeys = [
+                        'welcomeTitle', 'welcomeSubtitle', 'rentLabel', 'utilitiesText',
+                        'calculateBtn', 'editBtn', 'keepLAHousedTitle', 'currentLARSOTitle',
+                        'housingDeptTitle', 'savingsTitle', 'settingsTitle', 'rentTooLow',
+                        'rentTooHigh', 'rentRequired', 'rentInvalid'
+                    ];
+                    
+                    const languages = Object.keys(this.translations);
+                    const missingKeys = [];
+                    
+                    languages.forEach(lang => {
+                        requiredKeys.forEach(key => {
+                            if (!this.translations[lang] || !this.translations[lang][key]) {
+                                missingKeys.push(`${lang}.${key}`);
+                            }
+                        });
+                    });
+                    
+                    if (missingKeys.length > 0) {
+                        console.warn('Missing translation keys:', missingKeys);
+                    }
+                    
+                    return missingKeys.length === 0;
+                }
+
+                // Input validation
+                validateRentInput(value) {
+                    const errors = [];
+                    const numValue = parseFloat(value);
+                    
+                    if (!value || isNaN(numValue)) {
+                        errors.push(this.getTranslation('rentRequired'));
+                    } else if (numValue < 500) {
+                        errors.push(this.getTranslation('rentTooLow'));
+                    } else if (numValue > 25000) {
+                        errors.push(this.getTranslation('rentTooHigh'));
+                    }
+                    
+                    return errors;
+                }
+
+                // Show validation errors
+                showValidationError(inputElement, errors) {
+                    const errorElement = this.elements.rentError;
+                    
+                    if (errors.length > 0) {
+                        errorElement.textContent = errors[0];
+                        errorElement.classList.add('active');
+                        inputElement.classList.add('error');
+                        inputElement.setAttribute('aria-invalid', 'true');
+                        return false;
+                    } else {
+                        errorElement.textContent = '';
+                        errorElement.classList.remove('active');
+                        inputElement.classList.remove('error');
+                        inputElement.setAttribute('aria-invalid', 'false');
+                        return true;
+                    }
+                }
+
+                // Initialize chart resizing with ResizeObserver
+                initializeChartResizing() {
+                    if (window.ResizeObserver && this.elements.chart) {
+                        this.resizeObserver = new ResizeObserver(entries => {
+                            if (this.state.currentView === 'chart' && 
+                                this.state.isCalculatorVisible && 
+                                this.elements.chart) {
+                                
+                                clearTimeout(this.resizeTimeout);
+                                this.resizeTimeout = setTimeout(() => {
+                                    this.resizeCanvas();
+                                    this.updateProjections();
+                                }, 100);
+                            }
+                        });
+                        
+                        const chartContainer = this.elements.chart?.parentElement;
+                        if (chartContainer) {
+                            this.resizeObserver.observe(chartContainer);
+                        }
+                    } else {
+                        // Fallback for browsers without ResizeObserver
+                        this.initializeFallbackResizing();
+                    }
+                }
+
+                // Fallback resize handling
+                initializeFallbackResizing() {
+                    window.addEventListener('resize', () => {
+                        clearTimeout(this.resizeTimeout);
+                        this.resizeTimeout = setTimeout(() => {
+                            if (this.state.currentView === 'chart' && this.state.isCalculatorVisible) {
+                                this.resizeCanvas();
+                                this.updateProjections();
+                            }
+                        }, 250);
+                    });
+                }
+
+                bindEvents() {
+                    // Use event delegation for better performance
+                    this.container.addEventListener('click', this.handleClick.bind(this));
+                    this.container.addEventListener('input', this.handleInput.bind(this));
+                    this.container.addEventListener('change', this.handleChange.bind(this));
+                    this.container.addEventListener('blur', this.handleBlur.bind(this), true);
+                    this.container.addEventListener('keydown', this.handleKeyboard.bind(this));
+
+                    // Modal click outside to close
+                    if (this.elements.settingsModal) {
+                        this.elements.settingsModal.addEventListener('click', (e) => {
+                            if (e.target === this.elements.settingsModal) {
+                                this.elements.settingsModal.classList.remove('active');
+                            }
+                        });
+                    }
+
+                    // Initial canvas setup
+                    setTimeout(() => this.resizeCanvas(), 100);
+                }
+
+                handleClick(e) {
+                    const target = e.target.closest('[data-lang], [data-view], [data-years], [data-format], .submit-btn, .edit-btn, .settings-btn, .close-btn');
+                    if (!target) return;
+
+                    e.preventDefault();
+
+                    if (target.dataset.lang) {
+                        this.setLanguage(target.dataset.lang);
+                    } else if (target.dataset.view) {
+                        this.switchView(target.dataset.view);
+                    } else if (target.dataset.years) {
+                        this.setProjectionYears(parseInt(target.dataset.years));
+                    } else if (target.dataset.format) {
+                        this.setDisplayFormat(target.dataset.format);
+                    } else if (target.classList.contains('submit-btn')) {
+                        this.showCalculator();
+                    } else if (target.classList.contains('edit-btn')) {
+                        this.showWelcome();
+                    } else if (target.classList.contains('settings-btn')) {
+                        this.elements.settingsModal.classList.add('active');
+                    } else if (target.classList.contains('close-btn')) {
+                        this.elements.settingsModal.classList.remove('active');
+                    }
+                }
+
+                handleInput(e) {
+                    if (e.target.id === 'inflation-slider') {
+                        this.state.inflationRate = parseFloat(e.target.value);
+                        this.elements.inflationDisplay.textContent = this.state.inflationRate.toFixed(1);
+                        if (this.state.isCalculatorVisible) {
+                            this.calculate();
+                        }
+                    }
+                }
+
+                handleChange(e) {
+                    if (e.target.classList.contains('utilities-checkbox')) {
+                        this.state.utilitiesIncluded = e.target.checked;
+                        if (this.state.isCalculatorVisible) {
+                            this.updateRentDisplay();
+                            this.calculate();
+                        }
+                    }
+                }
+
+                handleBlur(e) {
+                    if (e.target.id === 'rent-input') {
+                        const value = e.target.value;
+                        const errors = this.validateRentInput(value);
+                        this.showValidationError(e.target, errors);
+                    }
+                }
+
+                // Enhanced keyboard navigation
+                handleKeyboard(e) {
+                    // Handle escape key in modal
+                    if (e.key === 'Escape' && this.elements.settingsModal?.classList.contains('active')) {
+                        this.elements.settingsModal.classList.remove('active');
+                        this.container.querySelector('.settings-btn')?.focus();
+                        return;
+                    }
+                    
+                    // Handle enter key on buttons
+                    if (e.key === 'Enter' && e.target.matches('button[data-lang], button[data-view], button[data-years], button[data-format]')) {
+                        e.target.click();
+                        return;
+                    }
+                    
+                    // Handle arrow keys for related button groups
+                    if (['ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                        this.handleArrowNavigation(e);
+                    }
+                }
+
+                // Arrow key navigation for button groups
+                handleArrowNavigation(e) {
+                    const buttonGroups = [
+                        '.lang-btn',
+                        '.toggle-btn', 
+                        '.view-tab',
+                        '.year-tab'
+                    ];
+                    
+                    const targetGroup = buttonGroups.find(selector => 
+                        e.target.matches(selector)
+                    );
+                    
+                    if (targetGroup) {
+                        const buttons = [...this.container.querySelectorAll(targetGroup)];
+                        const currentIndex = buttons.indexOf(e.target);
+                        let nextIndex;
+                        
+                        if (e.key === 'ArrowRight') {
+                            nextIndex = (currentIndex + 1) % buttons.length;
+                        } else {
+                            nextIndex = (currentIndex - 1 + buttons.length) % buttons.length;
+                        }
+                        
+                        buttons[nextIndex].focus();
+                        e.preventDefault();
+                    }
+                }
+
+                setLanguage(lang) {
+                    this.state.currentLanguage = lang;
+                    
+                    // Update button states
+                    this.elements.langBtns.forEach(btn => {
+                        btn.classList.toggle('active', btn.dataset.lang === lang);
+                    });
+                    
+                    this.updateLanguage();
+                    
+                    if (this.state.isCalculatorVisible) {
+                        this.updateRentDisplay();
+                        this.updateProjections();
+                        
+                        // Re-validate input with new language
+                        const rentValue = this.elements.rentInput?.value;
+                        if (rentValue) {
+                            const errors = this.validateRentInput(rentValue);
+                            this.showValidationError(this.elements.rentInput, errors);
+                        }
+                    }
+                }
+
+                updateLanguage() {
+                    // Bulk update using data attributes with robust error handling
+                    this.container.querySelectorAll('[data-translate]').forEach(el => {
+                        const key = el.dataset.translate;
+                        const translation = this.getTranslation(key);
+                        
+                        // Handle different element types
+                        if (el.tagName === 'INPUT' && el.type === 'submit') {
+                            el.value = translation;
+                        } else if (el.hasAttribute('placeholder')) {
+                            el.placeholder = translation;
+                        } else {
+                            el.textContent = translation;
+                        }
+                    });
+
+                    // Update ARIA labels for radio buttons
+                    this.elements.toggleBtns?.forEach(btn => {
+                        btn.setAttribute('aria-checked', btn.classList.contains('active'));
+                    });
+                }
+
+                showCalculator() {
+                    // Validate input before proceeding
+                    const rentValue = this.elements.rentInput?.value;
+                    const errors = this.validateRentInput(rentValue);
+                    
+                    if (!this.showValidationError(this.elements.rentInput, errors)) {
+                        // If validation fails, focus on the input and return
+                        this.elements.rentInput?.focus();
+                        return;
+                    }
+
+                    this.state.currentRent = parseFloat(rentValue) || 2000;
+                    this.state.utilitiesIncluded = this.elements.utilitiesCheckbox?.checked || false;
+                    this.state.isCalculatorVisible = true;
+                    
+                    this.elements.welcome?.classList.add('hidden');
+                    this.elements.calculator?.classList.add('active');
+                    
+                    this.updateRentDisplay();
+                    
+                    requestAnimationFrame(() => {
+                        this.resizeCanvas();
+                        this.calculate();
+                    });
+                }
+
+                showWelcome() {
+                    this.state.isCalculatorVisible = false;
+                    this.elements.welcome?.classList.remove('hidden');
+                    this.elements.calculator?.classList.remove('active');
+                    
+                    // Sync form values
+                    if (this.elements.rentInput) {
+                        this.elements.rentInput.value = this.state.currentRent;
+                    }
+                    if (this.elements.utilitiesCheckbox) {
+                        this.elements.utilitiesCheckbox.checked = this.state.utilitiesIncluded;
+                    }
+                }
+
+                switchView(view) {
+                    this.state.currentView = view;
+                    
+                    // Update tab states
+                    this.elements.viewTabs?.forEach(tab => {
+                        const isActive = tab.dataset.view === view;
+                        tab.classList.toggle('active', isActive);
+                        tab.setAttribute('aria-selected', isActive);
+                    });
+
+                    // Update content visibility
+                    this.elements.viewContents?.forEach(content => {
+                        content.classList.toggle('active', content.id === `${view}-view`);
+                    });
+
+                    this.updateProjections();
+                }
+
+                setProjectionYears(years) {
+                    this.state.projectionYears = years;
+                    
+                    this.elements.yearTabs?.forEach(tab => {
+                        tab.classList.toggle('active', parseInt(tab.dataset.years) === years);
+                    });
+
+                    if (this.state.isCalculatorVisible) {
+                        this.updateProjections();
+                    }
+                }
+
+                setDisplayFormat(format) {
+                    this.state.displayFormat = format;
+                    
+                    this.elements.toggleBtns?.forEach(btn => {
+                        const isActive = btn.dataset.format === format;
+                        btn.classList.toggle('active', isActive);
+                        btn.setAttribute('aria-checked', isActive);
+                    });
+                    
+                    if (this.state.isCalculatorVisible) {
+                        this.calculate();
+                    }
+                }
+
+                updateRentDisplay() {
+                    if (!this.elements.rentDisplay) return;
+                    
+                    const monthText = this.getTranslation('month');
+                    const utilitiesText = this.state.utilitiesIncluded ? 
+                        ` (${this.getTranslation('utilitiesIncluded')})` : "";
+                    this.elements.rentDisplay.textContent = 
+                        `${this.formatCurrency(this.state.currentRent)}/${monthText}${utilitiesText}`;
+                }
+
+                calculate() {
+                    try {
+                        const calculations = {
+                            progressive: this.calculateProgressiveFormula(this.state.currentRent, this.state.inflationRate),
+                            current: this.calculateCurrentLARSO(this.state.currentRent, this.state.inflationRate, this.state.utilitiesIncluded),
+                            moderate: this.calculateModerateFormula(this.state.currentRent, this.state.inflationRate)
+                        };
+
+                        this.updateResults(calculations);
+                        this.updateProjections();
+
+                        const annualSavings = (calculations.current.increaseAmount - calculations.progressive.increaseAmount) * 12;
+                        if (this.elements.savingsAmount) {
+                            this.elements.savingsAmount.textContent = this.formatCurrency(annualSavings);
+                        }
+                    } catch (error) {
+                        console.error('Calculation error:', error);
+                        this.showErrorMessage('Unable to calculate rent projections. Please check your input.');
+                    }
+                }
+
+                showErrorMessage(message) {
+                    // Create or update error message display
+                    let errorDisplay = this.container.querySelector('.calculation-error');
+                    if (!errorDisplay) {
+                        errorDisplay = document.createElement('div');
+                        errorDisplay.className = 'calculation-error';
+                        errorDisplay.style.cssText = 'color: #dc2626; text-align: center; padding: 1rem; background: #fef2f2; border-radius: 8px; margin: 1rem 0;';
+                        this.elements.calculator?.insertBefore(errorDisplay, this.elements.calculator.firstChild);
+                    }
+                    errorDisplay.textContent = message;
+                    errorDisplay.setAttribute('role', 'alert');
+                }
+
+                updateResults(calculations) {
+                    Object.keys(calculations).forEach(type => {
+                        const calc = calculations[type];
+                        
+                        // Update rent amounts
+                        const rentEl = this.container.querySelector(`[data-result="${type}"]`);
+                        if (rentEl) {
+                            rentEl.textContent = this.formatCurrency(calc.newRent);
+                        }
+                        
+                        // Update increases
+                        const increaseEl = this.container.querySelector(`[data-increase="${type}"]`);
+                        if (increaseEl) {
+                            if (this.state.displayFormat === 'percent') {
+                                increaseEl.textContent = `(+${calc.increasePercent.toFixed(1)}%)`;
+                            } else {
+                                increaseEl.textContent = `(+${this.formatCurrency(calc.increaseAmount)}/mo)`;
+                            }
+                        }
+                    });
+                }
+
+                calculateProgressiveFormula(rent, inflation) {
+                    const increasePercent = Math.min(inflation * 0.6, 3);
+                    const increaseAmount = rent * (increasePercent / 100);
+                    return {
+                        newRent: rent + increaseAmount,
+                        increaseAmount,
+                        increasePercent
+                    };
+                }
+
+                calculateCurrentLARSO(rent, inflation, utilitiesIncluded) {
+                    let increasePercent = 3;
+                    if (utilitiesIncluded) increasePercent += 2;
+                    
+                    const percentIncrease = rent * (increasePercent / 100);
+                    const monthlySurcharges = 4.44;
+                    const totalIncrease = percentIncrease + monthlySurcharges;
+
+                    return {
+                        newRent: rent + totalIncrease,
+                        increaseAmount: totalIncrease,
+                        increasePercent
+                    };
+                }
+
+                calculateModerateFormula(rent, inflation) {
+                    const increasePercent = Math.max(2, Math.min(inflation, 5));
+                    const increaseAmount = rent * (increasePercent / 100);
+                    return {
+                        newRent: rent + increaseAmount,
+                        increaseAmount,
+                        increasePercent
+                    };
+                }
+
+                formatCurrency(amount) {
+                    const locale = this.state.currentLanguage === 'es' ? 'es-US' : 'en-US';
+                    return new Intl.NumberFormat(locale, {
+                        style: "currency",
+                        currency: "USD",
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 0,
+                    }).format(amount);
+                }
+
+                resizeCanvas() {
+                    if (!this.elements.chart) return;
+                    
+                    const container = this.elements.chart.parentElement;
+                    if (!container) return;
+                    
+                    const rect = container.getBoundingClientRect();
+                    
+                    // High-DPI support
+                    const dpr = window.devicePixelRatio || 1;
+                    this.elements.chart.width = (rect.width - 30) * dpr;
+                    this.elements.chart.height = (window.innerWidth <= 600 ? 140 : 160) * dpr;
+                    this.elements.chart.style.width = (rect.width - 30) + 'px';
+                    this.elements.chart.style.height = (window.innerWidth <= 600 ? 140 : 160) + 'px';
+                    
+                    const ctx = this.elements.chart.getContext('2d');
+                    ctx.scale(dpr, dpr);
+                }
+
+                calculateProjectionData() {
+                    const data = [{ year: 0, progressive: this.state.currentRent, current: this.state.currentRent, moderate: this.state.currentRent }];
+
+                    let rents = {
+                        progressive: this.state.currentRent,
+                        current: this.state.currentRent,
+                        moderate: this.state.currentRent
+                    };
+
+                    for (let year = 1; year <= this.state.projectionYears; year++) {
+                        const calculations = {
+                            progressive: this.calculateProgressiveFormula(rents.progressive, this.state.inflationRate),
+                            current: this.calculateCurrentLARSO(rents.current, this.state.inflationRate, this.state.utilitiesIncluded),
+                            moderate: this.calculateModerateFormula(rents.moderate, this.state.inflationRate)
+                        };
+
+                        Object.keys(rents).forEach(type => {
+                            rents[type] = calculations[type].newRent;
+                        });
+
+                        data.push({
+                            year,
+                            progressive: rents.progressive,
+                            current: rents.current,
+                            moderate: rents.moderate
+                        });
+                    }
+
+                    return data;
+                }
+
+                updateProjections() {
+                    const data = this.calculateProjectionData();
+                    
+                    if (this.state.currentView === 'chart') {
+                        requestAnimationFrame(() => {
+                            this.resizeCanvas();
+                            this.drawChart(data);
+                        });
+                    } else {
+                        this.updateTable(data);
+                    }
+                }
+
+                drawChart(data) {
+                    const canvas = this.elements.chart;
+                    if (!canvas) return;
+                    
+                    const ctx = canvas.getContext('2d');
+                    const width = canvas.width / (window.devicePixelRatio || 1);
+                    const height = canvas.height / (window.devicePixelRatio || 1);
+                    
+                    ctx.clearRect(0, 0, width, height);
+                    
+                    if (data.length < 2) return;
+
+                    const padding = 35;
+                    const chartWidth = width - padding * 2;
+                    const chartHeight = height - padding * 2;
+
+                    const allValues = data.flatMap(d => [d.progressive, d.current, d.moderate]);
+                    const minValue = Math.min(...allValues);
+                    const maxValue = Math.max(...allValues);
+                    const valueRange = maxValue - minValue || 1;
+
+                    const getX = (year) => padding + (year / this.state.projectionYears) * chartWidth;
+                    const getY = (value) => padding + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+
+                    // Draw grid
+                    ctx.strokeStyle = "#f1f5f9";
+                    ctx.lineWidth = 1;
+
+                    ctx.beginPath();
+                    for (let i = 0; i <= this.state.projectionYears; i++) {
+                        const x = getX(i);
+                        ctx.moveTo(x, padding);
+                        ctx.lineTo(x, height - padding);
+                    }
+
+                    for (let i = 0; i <= 4; i++) {
+                        const y = padding + (i / 4) * chartHeight;
+                        ctx.moveTo(padding, y);
+                        ctx.lineTo(width - padding, y);
+                    }
+                    ctx.stroke();
+
+                    // Draw lines
+                    const lines = [
+                        { data: "progressive", color: "#ff914d", width: 3 },
+                        { data: "current", color: "#0303ab", width: 3 },
+                        { data: "moderate", color: "#666666", width: 3 }
+                    ];
+
+                    lines.forEach(line => {
+                        ctx.strokeStyle = line.color;
+                        ctx.lineWidth = line.width;
+                        ctx.beginPath();
+
+                        data.forEach((point, index) => {
+                            const x = getX(point.year);
+                            const y = getY(point[line.data]);
+
+                            if (index === 0) {
+                                ctx.moveTo(x, y);
+                            } else {
+                                ctx.lineTo(x, y);
+                            }
+                        });
+
+                        ctx.stroke();
+
+                        // Draw points
+                        ctx.fillStyle = line.color;
+                        data.forEach(point => {
+                            const x = getX(point.year);
+                            const y = getY(point[line.data]);
+                            ctx.beginPath();
+                            ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                            ctx.fill();
+                        });
+                    });
+
+                    // Draw labels
+                    ctx.fillStyle = "#6b7280";
+                    ctx.font = "10px sans-serif";
+                    ctx.textAlign = "center";
+
+                    // X-axis labels
+                    for (let i = 0; i <= this.state.projectionYears; i++) {
+                        const x = getX(i);
+                        ctx.fillText(i.toString(), x, height - 12);
+                    }
+
+                    // Y-axis labels
+                    ctx.textAlign = "right";
+                    for (let i = 0; i <= 4; i++) {
+                        const value = minValue + (i / 4) * valueRange;
+                        const y = padding + ((4 - i) / 4) * chartHeight + 3;
+                        ctx.fillText(this.formatCurrency(value), padding - 5, y);
+                    }
+                }
+
+                updateTable(data) {
+                    if (!this.elements.tableBody) return;
+                    
+                    this.elements.tableBody.innerHTML = "";
+
+                    data.slice(1).forEach(yearData => {
+                        const row = document.createElement("div");
+                        row.className = "table-row";
+                        row.setAttribute('role', 'row');
+
+                        row.innerHTML = `
+                            <div role="cell">${yearData.year}</div>
+                            <div role="cell">${this.formatCurrency(yearData.progressive)}</div>
+                            <div role="cell">${this.formatCurrency(yearData.current)}</div>
+                            <div role="cell">${this.formatCurrency(yearData.moderate)}</div>
+                        `;
+
+                        this.elements.tableBody.appendChild(row);
+                    });
+                }
+
+                // Cleanup method
+                destroy() {
+                    if (this.resizeObserver) {
+                        this.resizeObserver.disconnect();
+                        this.resizeObserver = null;
+                    }
+                    clearTimeout(this.resizeTimeout);
+                    
+                    // Remove event listeners
+                    this.container?.removeEventListener('click', this.handleClick);
+                    this.container?.removeEventListener('input', this.handleInput);
+                    this.container?.removeEventListener('change', this.handleChange);
+                    this.container?.removeEventListener('blur', this.handleBlur);
+                    this.container?.removeEventListener('keydown', this.handleKeyboard);
+                }
+            }
+
+            // Initialize when ready
+            function init() {
+                if (document.querySelector('.kla-rent-calculator')) {
+                    new OptimizedRentCalculator();
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+
+            setTimeout(init, 100);
+        })();
+    </script>
+</body>
+</html>
